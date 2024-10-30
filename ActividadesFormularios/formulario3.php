@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['enviar'])) {
 
     fin_html(); // Cierra el HTML generado por la función inicio_html
 
-// Si no se ha enviado una solicitud POST, muestra el formulario de pedido
+// Si no se ha enviado una solicitud POST, muestra el formulario de pedido con el metodo GET
 } else {
     ?>
     <!-- Formulario HTML para recoger datos del pedido -->

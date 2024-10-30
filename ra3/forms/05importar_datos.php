@@ -8,9 +8,9 @@ inicio_html("Subida de archivos. Importación de datos",
 echo "<header>Importación de datos</header>";
 
 if( $_SERVER['REQUEST_METHOD'] == "POST" ) {
-    if( isset($_FILES['archivo_csv']) && $_FILES['archivo_csv']['error'] == UPLOAD_ERR_OK ) {
+    if( isset($_FILES['archivo_csv']) && $_FILES['archivo_csv']['error'] == UPLOAD_ERR_OK ) { // Si se ha subido el archivo y no ha habido errores
 
-        $fila_cabecera = isset($_POST['fila_cabecera']);
+        $fila_cabecera = isset($_POST['fila_cabecera']); // Si se ha marcado la casilla de fila de cabecera o no 
         
         echo "<table>";
         echo "<caption>Importación de " . $_FILES['archivo_csv']['name'] . "</caption>";
@@ -22,12 +22,12 @@ if( $_SERVER['REQUEST_METHOD'] == "POST" ) {
             // Fila de cabecera
             if( $fila_cabecera ) {
                 // Leemos la fila de cabecera
-                $cabecera = fgetcsv($archivo);
+                $cabecera = fgetcsv($archivo); 
                 echo "<tr>";
                 foreach( $cabecera as $columna ) {
                     echo "<th>$columna</th>";
                 }
-                echo "</tr>" . PHP_EOL;
+                echo "</tr>" . PHP_EOL; // PHP_EOL es un salto de línea
                 echo "</thead>";
                 echo "<tbody>";
             }
@@ -66,7 +66,7 @@ if( $_SERVER['REQUEST_METHOD'] == "POST" ) {
         echo "<h3>Error. El archivo no se ha subido</h3>";
     }
 }
-else {
+else { // Esto es igual que poner GET
 ?>
 <form method="POST" action="<?=$_SERVER['PHP_SELF']?>" enctype="multipart/form-data">
     <fieldset>

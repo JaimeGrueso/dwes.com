@@ -16,7 +16,7 @@ ini_set("upload_max_filesize", 500 * 1024); // Modificar directamente en el serv
 ];
 // Array de compañias
 $compañias = [
-    "miair"     => Array('nombre' => 'MiAir', 'precio' => 0),
+    "myair"     => Array('nombre' => 'MyAir', 'precio' => 0),
     "airfly"   => Array('nombre' => 'AirFly', 'precio' => 50),
     "vuelaconmigo" => Array('nombre' => 'VuelaConmigo', 'precio' => 75),
     "apedalesair" => Array('nombre' => 'ApedaleAir', 'precio' => 150)
@@ -73,18 +73,91 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Datos recibidos, validados y saneados
+
     // Se genera el presupuesto
 
+    // Se inicia un buffer de salida
+    ob_start();
+
+    // Datos personales
+    echo "<h3>Datos del presupuesto para las vacaciones</h3>";
+
+    echo "<p>Persona Responsable: $responsable - " . ($email ? $email : "Email no valido") . "<br>";
+    echo "Telefono de contacto: " . ($telefono ? $telefono : "Telefono no valido") . "<br>";
     $total = 0;
-    if($destino) {
-        $total += $destinos[$destino]['precio'];
+    if($destino && $personas && $dias) {
+        echo "Destino: {$destinos[$destino]['nombre']}<br>";
+        echo "Numero de personas: $personas<br>";
+        echo "Numero de dias: $dias<br>";
+        $precio_destino = $destinos[$destino]['precio'] * intval($personas) * intval($dias); 
+        echo "Precio por ir a  {$destinos[$destino]['nombre']} para $perosnas personas durante $dias dias es de $precio_destino</p>";
+        $total += $precio_destino;
+    }
+    else {
+        ob_clean();
+        echo "<h3>Error. El destino, las personas o el dia no son correctos</h3>";
+
+        // Enviar el formulario
+
+        muestra_formulario();
+        fin_html();
+        ob_flush();
+        exit(1);
+    }
+
+    if ($compañia && $persona) {
+        echo "<p>Linea aerea {$compañias[$compañias]['nombre']}<br>";
+        if (strtoupper($compañia == 'MyAir')) {
+            echo "Sin coste adicional<br>";
+        }
+    }
+    else {
+        $precio_compañia = $compañias[$compañia]['precio'];
+        $total_compañia = $precio_compañia * intval($personas);
+        echo "Suplemento por linea aerea: $total_compañia €</p>";
+        $total += $total_compañia;
+    }
+}
+else {
+    ob_clean();
+        echo "<h3>Error. La linea aerea o las personas son erroneas</h3>";
+
+        // Enviar el formulario
+
+        muestra_formulario();
+        fin_html();
+        ob_flush();
+        exit(2);
+}
+
+    if ($hotel && $personas && $dias) {
+        echo "<p>Hotel: $hotel *<br>";
+        $precio_hotel = $hoteles[$hotel];
+        $total_hotel = $precio_hotel * intval($personas) * intval($dias);
+        if ($precio_hotel == 0) {
+            echo "Sin sobrecoste por hotel de $hotel estrellas</p>";
+        }
+        else {
+            echo "Suplemento por hotel de $hotel estrellas: $total_hotel €</p>";
+        }
+    }    
+    else {
+        ob_clean();
+        echo "<h3>Error. La categoria de hotal o el numero de dias o personas es erroneo</h3>";
+
+        // Enviar el formulario
+
+        muestra_formulario();
+        fin_html();
+        ob_flush();
+        exit(3);
     }
 
 
+    // subida de archivos
+    if ($_FILES['libro']['error'] == UPLOAD_ERR_OK) { // El arvhivo de ha subido y se puede gestionar
+    }
 
-
-
-}
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     // Poner el formulario si no es sticky form
 
@@ -92,10 +165,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     // del formulario con valores por defecto
 }
 
-    // Si es sticcky form, el formulario viene aqui
+    // Si es sticky form, el formulario viene aqui
 
+    function muestra_formulario() { 
+        global $destinos, $compañias, $hoteles;
 ?>
-<header></header>
 <form action="<?=$_SERVER['PHP_SELF']?>" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="MAX_FILE_SIZE" value="<?=500*1024?>">
     <fieldset>
@@ -161,10 +235,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         <input type="file" name="libro" id="libro">
         
     </fieldset>
+    <input type="submit" name="operacion" id="operacion" value="Calcular presupuesto">
 
 </form>
 
 <?php
+}
 fin_html();
-
+ob_flush();
 ?>
