@@ -19,6 +19,8 @@ $empleados = [
         'aceptacion' => true]
     ];
 
+// ===========================================================================================
+
 function validarDatos() { // Sanea to del tiron. Esto es un primer filtro.
     global $empleados;
     $opcionesValidado = [
@@ -56,7 +58,7 @@ function validarDatos() { // Sanea to del tiron. Esto es un primer filtro.
         return false;
     }
 }
-
+// ===========================================================================================
 function mostrarEmpleados($empleado) {
     global $empleados;
 
@@ -80,7 +82,7 @@ function mostrarEmpleados($empleado) {
         echo "</tr>";
     }
 }
-
+// ===========================================================================================
 function añadirEmpleado($empleado) { // Esto al final no se usa como queriamos
     global $empleados;
 
@@ -119,10 +121,11 @@ function subirPDF($archivo) {
         return false;
     }
 }
+// ===========================================================================================
 
 inicio_html("Ejercicio7Tuneado", ["/estilos/formulario.css", "/estilos/general.css", "/estilos/tablas.css"]);
 
-// =========================================================================
+// ========================================================================= DE AQUI PA RRIBA PHP
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['enviar'])) {
     if ($datos = validarDatos()) {
@@ -139,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 }
 
-// =========================================================================
+// ========================================================================= DE AQUI PA BAJO HTML
 
 function mostrarFormulario($datos) {
 
@@ -156,10 +159,10 @@ function mostrarFormulario($datos) {
             <input type="text" name="nombre" id="nombre" value="<?=isset($datos['nombre']) ? $datos['nombre'] : ''?>">
 
             <label for="apellidos">Apellidos</label>
-            <input type="text" name="apellidos" id="apellidos">
+            <input type="text" name="apellidos" id="apellidos" value="<?=isset($datos['apellidos']) ? $datos['apellidos'] : ''?>">
 
             <label for="email">Email</label>
-            <input type="email" name="email" id="email">
+            <input type="email" name="email" id="email" value="<?=isset($datos['email']) ? $datos['email'] : ''?>">
 
             <label for="aceptacion">Aceptar Terminos y Condiciones</label> 
             <input type="checkbox" name="aceptacion" id="aceptacion"
