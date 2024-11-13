@@ -14,9 +14,12 @@
     - Por defecto, PASSWORD_DEFAULT utiliza el algoritmo BCRYPT con un coste de 10
 */
 
-session_start();
+session_start(['gc_maxlifetime' => 60 * 60]);
+
+date_default_timezone_set("Europe/Madrid");
 
 require_once($_SERVER['DOCUMENT_ROOT'] . "/includes/funciones.php");
+require_once("/03jwt_include.php");
 
 $usuarios = ['manuel@hotmail.com' => ['nombre' => 'Manuel García',
                                       'password' => password_hash("abc123", PASSWORD_DEFAULT),
@@ -60,11 +63,37 @@ if( $_SERVER['REQUEST_METHOD'] == "POST") {
 
     if( autentica_usuario($login, $clave) ) {
         // Autenticación ha tenido éxito
-        $_SESSION['usuario'] = $login;
-        $_SESSION['nombre'] = $usuarios[$login]['nombre'];
-        $_SESSION['perfil'] = $usuarios[$login]['perfil'];
+        // Empieza la generación del token JWT
 
-        header("Location: /ra4/autenticacion/02bienvenida.php");
+        // Genero el array con los datos de usuario
+
+        $usuario = [
+            'id'       => $login,
+            'username' => $usuarios[$login]['nombre'],
+            'role'     => $usuarios[$login]['perfil']
+        ];
+
+        if( file_exists("03clave.txt") ) {
+            $fichero_clave = fopen("03clave.txt", "r");
+            $clave = fgets($fichero_clave);
+            fclose($fichero_clave);
+        }
+        else {
+            $clave = "abc123";
+        }
+
+        $jwt = generar_token($usuario, $clave);
+
+        echo "<p>El token generado: $jwt</p>";
+
+        // El tiempo de validez del jwt es 1 hora
+        $expire = time() + 60 * 60;
+
+        // Se establece la cookie para enviar el jwt al cliente
+        // setcookie("jwt", $jwt, $expire, "/", "dwes.com", true, true);
+        setcookie("jwt", $jwt, $expire, "/", "dwes.com");
+        
+        echo "<p>Usuario autenticado. Vaya a la <a href='03jwt_bienvenido.php'>zona restringida</a></p>";        
     }
     else {
         // La autenticación no ha tenido éxito
